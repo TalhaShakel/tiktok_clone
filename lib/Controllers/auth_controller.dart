@@ -11,12 +11,30 @@ import 'package:thiktok_clone/Models/user.dart' as model;
 import 'package:image_picker/image_picker.dart';
 import 'package:thiktok_clone/constants.dart';
 import '';
+import '../Views/screens/auth/login_screen.dart';
+import '../Views/screens/home_screen.dart';
 
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
+  late Rx<User?> _user;
 
   late Rx<File?> _pickedImage;
   File? get profilePhoto => _pickedImage.value;
+  @override
+  void onReady() {
+    super.onReady();
+    _user = Rx<User?>(firebaseAuth.currentUser);
+    _user.bindStream(firebaseAuth.authStateChanges());
+    ever(_user, _setInitialScreen);
+  }
+
+  _setInitialScreen(User? user) {
+    if (user == null) {
+      Get.offAll(() => LoginScreen());
+    } else {
+      Get.offAll(() => const HomeScreen());
+    }
+  }
 
   void pickImage() async {
     final pickedImage =
@@ -99,20 +117,29 @@ class AuthController extends GetxController {
   void loginUser(String email, String password) async {
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
+        EasyLoading.show();
+
         await firebaseAuth.signInWithEmailAndPassword(
             email: email, password: password);
+        EasyLoading.dismiss();
       } else {
+        EasyLoading.dismiss();
+
         Get.snackbar(
           'Error Logging in',
           'Please enter all the fields',
         );
       }
     } on FirebaseException catch (e) {
+      EasyLoading.dismiss();
+
       Get.snackbar(
         'Error Loggin gin',
         e.message.toString(),
       );
     } catch (e) {
+      EasyLoading.dismiss();
+
       Get.snackbar(
         'Error Loggin gin',
         e.toString(),
