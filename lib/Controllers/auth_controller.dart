@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:thiktok_clone/constants.dart';
@@ -21,10 +22,11 @@ class AuthController extends GetxController {
     final pickedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
+      _pickedImage = Rx<File?>(File(pickedImage.path));
+
       Get.snackbar('Profile Picture',
           'You have successfully selected your profile picture!');
     }
-    _pickedImage = Rx<File?>(File(pickedImage!.path));
   }
 
   // upload to firebase storage
@@ -48,6 +50,7 @@ class AuthController extends GetxController {
           email.isNotEmpty &&
           password.isNotEmpty &&
           image != null) {
+        EasyLoading.show();
         // save out user to our ath and firebase firestore
         UserCredential cred = await firebaseAuth.createUserWithEmailAndPassword(
           email: email,
@@ -64,13 +67,28 @@ class AuthController extends GetxController {
             .collection('users')
             .doc(cred.user!.uid)
             .set(user.toJson());
+        EasyLoading.dismiss();
       } else {
+        EasyLoading.dismiss();
+
         Get.snackbar(
           'Error Creating Account',
           'Please enter all the fields',
         );
       }
+    } on Exception catch (e) {
+      EasyLoading.dismiss();
+
+      print(e);
+
+      Get.snackbar(
+        'Error Creating Account',
+        e.toString(),
+      );
     } catch (e) {
+      EasyLoading.dismiss();
+
+      print(e);
       Get.snackbar(
         'Error Creating Account',
         e.toString(),
@@ -89,6 +107,11 @@ class AuthController extends GetxController {
           'Please enter all the fields',
         );
       }
+    } on FirebaseException catch (e) {
+      Get.snackbar(
+        'Error Loggin gin',
+        e.message.toString(),
+      );
     } catch (e) {
       Get.snackbar(
         'Error Loggin gin',

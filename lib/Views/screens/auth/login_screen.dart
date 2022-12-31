@@ -3,7 +3,6 @@ import 'package:thiktok_clone/Views/screens/auth/signup_screen.dart';
 import 'package:thiktok_clone/Views/widgets/text_input_field.dart';
 import 'package:thiktok_clone/constants.dart';
 
-
 class LoginScreen extends StatelessWidget {
   LoginScreen({Key? key}) : super(key: key);
 
@@ -72,10 +71,10 @@ class LoginScreen extends StatelessWidget {
               ),
               child: InkWell(
                 onTap: () {
-                  // authController.loginUser(
-                  //   _emailController.text,
-                  //   _passwordController.text,
-                  // );
+                  authController.loginUser(
+                    _emailController.text,
+                    _passwordController.text,
+                  );
                 },
                 child: const Center(
                   child: Text(
