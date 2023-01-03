@@ -10,13 +10,13 @@ import 'package:thiktok_clone/Models/user.dart' as model;
 
 import 'package:image_picker/image_picker.dart';
 import 'package:thiktok_clone/constants.dart';
-import '';
 import '../Views/screens/auth/login_screen.dart';
 import '../Views/screens/home_screen.dart';
 
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
   late Rx<User?> _user;
+  User get user => _user.value!;
 
   late Rx<File?> _pickedImage;
   File? get profilePhoto => _pickedImage.value;

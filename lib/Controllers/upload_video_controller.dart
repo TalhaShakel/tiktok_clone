@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:thiktok_clone/Models/video.dart';
 import 'package:thiktok_clone/constants.dart';
@@ -39,6 +40,7 @@ class UploadVideoController extends GetxController {
   // upload video
   uploadVideo(String songName, String caption, String videoPath) async {
     try {
+      EasyLoading.show();
       String uid = firebaseAuth.currentUser!.uid;
       DocumentSnapshot userDoc =
           await firestore.collection('users').doc(uid).get();
@@ -65,8 +67,18 @@ class UploadVideoController extends GetxController {
       await firestore.collection('videos').doc('Video $len').set(
             video.toJson(),
           );
+      EasyLoading.dismiss();
       Get.back();
+    } on FirebaseException catch (e) {
+      EasyLoading.dismiss();
+
+      Get.snackbar(
+        'Error Uploading Video',
+        e.message.toString(),
+      );
     } catch (e) {
+      EasyLoading.dismiss();
+
       Get.snackbar(
         'Error Uploading Video',
         e.toString(),
