@@ -124,8 +124,11 @@ class CommentScreen extends StatelessWidget {
                   ),
                 ),
                 trailing: TextButton(
-                  onPressed: () =>
-                      commentController.postComment(_commentController.text),
+                  onPressed: () async {
+                    await commentController
+                        .postComment(_commentController.text);
+                    _commentController.clear();
+                  },
                   child: const Text(
                     'Send',
                     style: TextStyle(

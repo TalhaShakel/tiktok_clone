@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:thiktok_clone/Views/widgets/network.dart';
 import 'package:thiktok_clone/constants.dart';
 
 import 'package:thiktok_clone/Models/user.dart' as model;
@@ -21,18 +24,38 @@ class AuthController extends GetxController {
   late Rx<File?> _pickedImage;
   File? get profilePhoto => _pickedImage.value;
   @override
-  void onReady() {
+  void onReady() async {
     super.onReady();
     _user = Rx<User?>(firebaseAuth.currentUser);
     _user.bindStream(firebaseAuth.authStateChanges());
+    // bool v = await checkInternet();
+    // print(v);
     ever(_user, _setInitialScreen);
   }
 
-  _setInitialScreen(User? user) {
-    if (user == null) {
-      Get.offAll(() => LoginScreen());
+  _setInitialScreen(User? user) async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult == ConnectivityResult.mobile) {
+      print("mobile");
+      if (user == null) {
+        Get.offAll(() => LoginScreen());
+      } else {
+        Get.offAll(() => const HomeScreen());
+      }
+      // I am connected to a mobile network.
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      print("wifi");
+
+      if (user == null) {
+        Get.offAll(() => LoginScreen());
+      } else {
+        Get.offAll(() => const HomeScreen());
+      }
+
+      // I am connected to a wifi network.
     } else {
-      Get.offAll(() => const HomeScreen());
+      Center(child: CircularProgressIndicator());
     }
   }
 
@@ -145,5 +168,9 @@ class AuthController extends GetxController {
         e.toString(),
       );
     }
+  }
+
+  void signOut() async {
+    await firebaseAuth.signOut();
   }
 }

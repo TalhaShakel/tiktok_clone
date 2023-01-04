@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:thiktok_clone/Models/comment.dart';
 import 'package:thiktok_clone/constants.dart';
@@ -35,6 +36,7 @@ class CommentController extends GetxController {
 
   postComment(String commentText) async {
     try {
+      EasyLoading.show();
       if (commentText.isNotEmpty) {
         DocumentSnapshot userDoc = await firestore
             .collection('users')
@@ -70,7 +72,17 @@ class CommentController extends GetxController {
           'commentCount': (doc.data()! as dynamic)['commentCount'] + 1,
         });
       }
+      EasyLoading.dismiss();
+    } on FirebaseException catch (e) {
+      EasyLoading.dismiss();
+
+      Get.snackbar(
+        'Error While Commenting',
+        e.message.toString(),
+      );
     } catch (e) {
+      EasyLoading.dismiss();
+
       Get.snackbar(
         'Error While Commenting',
         e.toString(),
@@ -79,32 +91,50 @@ class CommentController extends GetxController {
   }
 
   likeComment(String id) async {
-    var uid = authController.user.uid;
-    DocumentSnapshot doc = await firestore
-        .collection('videos')
-        .doc(_postId)
-        .collection('comments')
-        .doc(id)
-        .get();
+    try {
+      EasyLoading.show();
+      var uid = authController.user.uid;
+      DocumentSnapshot doc = await firestore
+          .collection('videos')
+          .doc(_postId)
+          .collection('comments')
+          .doc(id)
+          .get();
 
-    if ((doc.data()! as dynamic)['likes'].contains(uid)) {
-      await firestore
-          .collection('videos')
-          .doc(_postId)
-          .collection('comments')
-          .doc(id)
-          .update({
-        'likes': FieldValue.arrayRemove([uid]),
-      });
-    } else {
-      await firestore
-          .collection('videos')
-          .doc(_postId)
-          .collection('comments')
-          .doc(id)
-          .update({
-        'likes': FieldValue.arrayUnion([uid]),
-      });
+      if ((doc.data()! as dynamic)['likes'].contains(uid)) {
+        await firestore
+            .collection('videos')
+            .doc(_postId)
+            .collection('comments')
+            .doc(id)
+            .update({
+          'likes': FieldValue.arrayRemove([uid]),
+        });
+      } else {
+        await firestore
+            .collection('videos')
+            .doc(_postId)
+            .collection('comments')
+            .doc(id)
+            .update({
+          'likes': FieldValue.arrayUnion([uid]),
+        });
+      }
+      EasyLoading.dismiss();
+    } on FirebaseException catch (e) {
+      EasyLoading.dismiss();
+
+      Get.snackbar(
+        'Error While Commenting',
+        e.message.toString(),
+      );
+    } catch (e) {
+      EasyLoading.dismiss();
+
+      Get.snackbar(
+        'Error While Commenting',
+        e.toString(),
+      );
     }
   }
 }

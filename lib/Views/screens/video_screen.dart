@@ -5,6 +5,7 @@ import 'package:thiktok_clone/Views/screens/comment_screen.dart';
 import 'package:thiktok_clone/Views/widgets/circle_animation.dart';
 import 'package:thiktok_clone/Views/widgets/video_player_iten.dart';
 import 'package:thiktok_clone/constants.dart';
+import 'package:thiktok_clone/main.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoScreen extends StatelessWidget {
@@ -80,7 +81,7 @@ class VideoScreen extends StatelessWidget {
           controller: PageController(initialPage: 0, viewportFraction: 1),
           itemBuilder: (context, index) {
             final data = videoController.videoList[index];
-
+            // print(isConnected);
             return Stack(
               children: [
                 // VideoPlayer(controller)

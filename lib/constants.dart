@@ -4,14 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:thiktok_clone/Views/screens/add_video_screen.dart';
+import 'package:thiktok_clone/Views/screens/profile_screen.dart';
+import 'package:thiktok_clone/Views/screens/search_screen.dart';
 import 'package:thiktok_clone/Views/screens/video_screen.dart';
 
 List pages = [
   VideoScreen(),
-  Text('Messages Screen'),
+  SearchScreen(),
   const AddVideoScreen(),
   Text('Messages Screen'),
-  Text('Messages Screen'),
+  ProfileScreen(uid: authController.user.uid),
 ];
 
 //color
